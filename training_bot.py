@@ -1,7 +1,9 @@
+import os
 import json
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 from collections import defaultdict
+import sys
 
 DATA_FILE = "training_data.json"
 
@@ -58,14 +60,18 @@ async def leaderboard(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_markdown(message)
 
 async def main():
-    bot_token = "YOUR_BOT_TOKEN_HERE"
+    bot_token = os.getenv("BOT_TOKEN")
+    if not bot_token:
+        print("❌ Error: BOT_TOKEN environment variable not set.")
+        sys.exit(1)
+
     app = ApplicationBuilder().token(bot_token).build()
 
     app.add_handler(CommandHandler("trained", trained))
     app.add_handler(CommandHandler("progress", progress))
     app.add_handler(CommandHandler("leaderboard", leaderboard))
 
-    print("Bot running...")
+    print("✅ Bot is running...")
     await app.run_polling()
 
 if __name__ == "__main__":
